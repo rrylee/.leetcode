@@ -1,44 +1,53 @@
 package main
 
-import "fmt"
+import (
+	"github.com/davecgh/go-spew/spew"
+)
+
+type Node struct {
+	Left  *Node
+	Right *Node
+	Val   int
+}
 
 func main() {
-	fmt.Println(minMoney([][]int{
-		{7, 2, 9},
-		{5, 13, 8},
-		{9, 2, 4},
-	}))
-}
-
-func minMoney(nums [][]int) int {
-	l := len(nums)
-	min := 0
-	for i := 0; i < l; i++ {
-		if i == 0 {
-			min = minf(nums[0][0], nums[0][1], nums[0][2])
-			continue
-		}
-
-		nums[i][0] += minf(nums[i-1][1], nums[i-1][2])
-		nums[i][1] += minf(nums[i-1][0], nums[i-1][2])
-		nums[i][2] += minf(nums[i-1][0], nums[i-1][1])
-
-		if i == l-1 {
-			min = minf(nums[i][0], nums[i][1], nums[i][2])
-		}
-	}
-	fmt.Println(nums)
-	return min
-}
-
-func minf(nums ...int) int {
-	n := nums[0]
-
-	for _, num := range nums {
-		if num < n {
-			n = num
-		}
+	root := &Node{
+		Val: 1,
+		Left: &Node{
+			Val: 2,
+			Left: &Node{
+				Val: 3,
+				Right: &Node{
+					Val: 4,
+				},
+			},
+		},
 	}
 
-	return n
+	spew.Dump(getLeftNodes(root))
+}
+
+func getLeftNodes(root *Node) []*Node {
+	if root == nil {
+		return nil
+	}
+
+	leftNodes := []*Node{}
+	bfs(root, 0, &leftNodes)
+
+	return leftNodes
+}
+
+func bfs(node *Node, level int, leftNodes *[]*Node) {
+	if len(*leftNodes) == level {
+		*leftNodes = append(*leftNodes, node)
+	}
+
+	if node.Left != nil {
+		bfs(node.Left, level+1, leftNodes)
+	}
+
+	if node.Right != nil {
+		bfs(node.Right, level+1, leftNodes)
+	}
 }
